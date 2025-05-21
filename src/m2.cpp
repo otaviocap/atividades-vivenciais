@@ -25,22 +25,32 @@ struct Triangle {
 };
 
 constexpr glm::vec3 colors[] = {
-    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-    glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f),
-    glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 1.0f, 0.0f),
-    glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.5f, 1.0f, 0.5f),
-    glm::vec3(0.5f, 1.0f, 1.0f)};
+    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
+    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 1.0f, 0.0f),
+    glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+    glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.5f, 0.5f, 0.5f),
+    glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f),
+    glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(0.8f, 0.4f, 0.1f),
+    glm::vec3(0.9f, 0.6f, 0.2f), glm::vec3(0.7f, 0.3f, 0.0f),
+    glm::vec3(1.0f, 0.7f, 0.5f), glm::vec3(0.5f, 0.0f, 0.5f),
+    glm::vec3(0.6f, 0.2f, 0.8f), glm::vec3(0.4f, 0.0f, 0.6f),
+    glm::vec3(0.1f, 0.8f, 0.9f), glm::vec3(0.2f, 0.6f, 0.8f),
+    glm::vec3(0.0f, 0.5f, 0.5f), glm::vec3(0.4f, 0.6f, 0.2f),
+    glm::vec3(0.6f, 0.4f, 0.2f), glm::vec3(0.7f, 0.5f, 0.3f),
+    glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.3f, 0.3f, 0.3f),
+    glm::vec3(1.0f, 0.8f, 0.8f), glm::vec3(0.8f, 1.0f, 0.8f),
+    glm::vec3(0.8f, 0.8f, 1.0f), glm::vec3(1.0f, 1.0f, 0.8f),
+    glm::vec3(1.0f, 0.8f, 1.0f), glm::vec3(0.8f, 1.0f, 1.0f)};
 
 glm::vec3 randomColor() {
     return colors[rand() % sizeof(colors) / sizeof(colors[0])];
-};
+}
 
 std::vector<Triangle> triangles;
 glm::vec2 nextTrianglePosition[3] = {};
 int currentVertice = 0;
 
-constexpr auto vertexShaderSource =
-    R"GLSL(
+constexpr auto vertexShaderSource = R"GLSL(
 #version 330 core
 layout (location = 0) in vec3 aPos;
 
@@ -187,21 +197,19 @@ int main() {
                 double xpos, ypos;
                 glfwGetCursorPos(window, &xpos, &ypos);
 
-                nextTrianglePosition[currentVertice] = glm::vec2(xpos, ypos);
+                nextTrianglePosition[currentVertice] = glm::vec2(
+                    -1 * (1 - (2 * xpos / WIDTH)), (1 - (2 * ypos / HEIGHT)));
+
                 currentVertice += 1;
-                std::cout << 'X' << xpos / WIDTH << 'Y' << ypos / HEIGHT
-                          << std::endl;
 
                 if (currentVertice == 3) {
-                    Triangle triangle = createTriangle(
-                        ((float)nextTrianglePosition[0].x - WIDTH) / WIDTH,
-                        ((float)nextTrianglePosition[0].y - HEIGHT) / HEIGHT,
-                        ((float)nextTrianglePosition[1].x - WIDTH) / WIDTH,
-                        ((float)nextTrianglePosition[1].y - HEIGHT) / HEIGHT,
-                        ((float)nextTrianglePosition[2].x - WIDTH) / WIDTH,
-                        ((float)nextTrianglePosition[2].y - HEIGHT) / HEIGHT);
-
-                    std::cout << "Adding triangle" << std::endl;
+                    Triangle triangle =
+                        createTriangle((float)nextTrianglePosition[0].x,
+                                       (float)nextTrianglePosition[0].y,
+                                       (float)nextTrianglePosition[1].x,
+                                       (float)nextTrianglePosition[1].y,
+                                       (float)nextTrianglePosition[2].x,
+                                       (float)nextTrianglePosition[2].y);
 
                     currentVertice = 0;
                 }
@@ -210,15 +218,9 @@ int main() {
 
     const GLuint shaderProgram = createShaderProgram();
 
-    // triangles.push_back(createTriangle(-0.5f,  -0.5f, 0.5f, -0.5f, 0.0,
-    // 0.5f));
-
     GLint colorLoc = glGetUniformLocation(shaderProgram, "inputColor");
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    glm::mat4 projection = glm::ortho(0.0, 800.0, 600.0, 0.0, -1.0, 1.0);
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1,
-                       GL_FALSE, value_ptr(projection));
+    glUseProgram(shaderProgram);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
