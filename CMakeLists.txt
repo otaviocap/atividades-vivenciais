@@ -21,9 +21,16 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/g-truc/glm.git
   GIT_TAG master  # Define a versão desejada da GLM
 )
-
-# Faz o download e compila as bibliotecas
 FetchContent_MakeAvailable(glfw glm)
+
+# Configura o FetchContent para baixar a stb_image automaticamente
+FetchContent_Declare(
+  stb_image
+  GIT_REPOSITORY https://github.com/nothings/stb.git
+  GIT_TAG master
+)
+
+FetchContent_MakeAvailable(stb_image)
 
 # Adiciona as pastas de cabeçalhos
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -35,6 +42,7 @@ include_directories(${glm_SOURCE_DIR})
 # Lista de exemplos/exercícios podem ser colocados aqui também
 set(EXERCISES
         m2
+        m3
 )
 
 add_compile_options(-Wno-pragmas)
@@ -62,6 +70,6 @@ endif()
 foreach(EXERCISE ${EXERCISES})
     get_filename_component(EXE_NAME ${EXERCISE} NAME)
     add_executable(${EXE_NAME} src/${EXERCISE}.cpp ${GLAD_C_FILE})
-    target_include_directories(${EXE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR})
+    target_include_directories(${EXE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
     target_link_libraries(${EXE_NAME} glfw ${OPENGL_LIBS})
 endforeach()
