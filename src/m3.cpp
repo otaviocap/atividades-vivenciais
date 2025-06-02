@@ -251,7 +251,6 @@ int main() {
         ParallaxLayer pl = {};
         pl.offsetSpeed = (float) i / 16.0f;
         pl.textureId = loadTexture("../assets/" + std::to_string(i + 1) + ".png");
-        glTexParameteri(pl.textureId, GL_TEXTURE_WRAP_S, GL_REPEAT);
 
         parallaxLayers[i] = pl;
     }
