@@ -54,4 +54,4 @@ make
 
 ## 📚 Exercícios Disponíveis
 - `m2`: Implementa o primeiro exercício vivencial
-- `m3`: Implementado a atividade com parallax
+- `m4`: Implementado a atividade com parallax

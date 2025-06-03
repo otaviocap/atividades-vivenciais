@@ -42,7 +42,7 @@ include_directories(${glm_SOURCE_DIR})
 # Lista de exemplos/exercícios podem ser colocados aqui também
 set(EXERCISES
         m2
-        m3
+        m4
 )
 
 add_compile_options(-Wno-pragmas)
