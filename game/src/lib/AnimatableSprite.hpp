@@ -31,7 +31,7 @@ public:
 
     void changeDirection(Direction direction);
 
-    void draw(const GLuint modelLoc, const GLuint offsetLoc);
+    void draw(GLuint modelLoc, GLuint offsetLoc) const;
 };
 
 

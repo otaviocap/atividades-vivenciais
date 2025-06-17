@@ -1,57 +1,24 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
-#include <algorithm>
 #include <iostream>
 #include <string>
 
 #include <glad.h>
 #include "GLFW/glfw3.h"
-#include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include "glm/gtx/matrix_factorisation.hpp"
-
 #include "lib/Sprite.hpp"
 #include "lib/AnimatableSprite.hpp"
+#include "shaders/BaseShader.hpp"
 
 constexpr int WIDTH = 800;
 constexpr int HEIGHT = 600;
 constexpr int FPS = 4;
 
 AnimatableSprite character;
-
-constexpr auto vertexShaderSource = R"GLSL(
- #version 400
- layout (location = 0) in vec3 position;
- layout (location = 1) in vec2 texc;
- out vec2 tex_coord;
-
- uniform mat4 projection;
- uniform mat4 model;
-
- void main()
- {
-	tex_coord = vec2(texc.s, texc.t);
-	gl_Position = projection * model * vec4(position, 1.0);
- }
- )GLSL";
-
-constexpr auto fragmentShaderSource = R"GLSL(
- #version 400
- in vec2 tex_coord;
- out vec4 color;
- uniform sampler2D tex_buff;
-
-uniform vec2 offset;
-
- void main()
- {
-	 color = texture(tex_buff, vec2(tex_coord.x + offset.x, tex_coord.y + offset.y));
- }
- )GLSL";
 
 void framebuffer_size_callback(GLFWwindow *window, const int width, const int height) {
     glViewport(0, 0, width, height);
@@ -77,49 +44,6 @@ void process_input(GLFWwindow *window) {
     }
 }
 
-GLuint compileShader(const char *shaderSource, int shaderType) {
-    const GLuint shaderId = glCreateShader(shaderType);
-    glShaderSource(shaderId, 1, &shaderSource, nullptr);
-    glCompileShader(shaderId);
-
-    int success;
-    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        char infoLog[512];
-        glGetShaderInfoLog(shaderId, sizeof(infoLog), nullptr, infoLog);
-        std::cout << "ERROR::SHADER::COMPILATION_FAILED\n"
-                << infoLog << std::endl;
-    }
-
-    return shaderId;
-}
-
-GLuint createShaderProgram() {
-    const GLuint vertexShader =
-            compileShader(vertexShaderSource, GL_VERTEX_SHADER);
-    const GLuint fragmentShader =
-            compileShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
-
-    const GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    int success;
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        char infoLog[512];
-        glGetProgramInfoLog(shaderProgram, sizeof(infoLog), nullptr, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-                << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return shaderProgram;
-}
 
 GLuint createVBOAndBind(const GLuint VAO, const float *vertices, const int verticesLength) {
     GLuint VBO;
@@ -250,7 +174,7 @@ int main() {
     glViewport(0, 0, WIDTH, HEIGHT);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    const GLuint shaderProgram = createShaderProgram();
+    GLuint shaderProgram = createShaderProgram();
     Sprite background = generateBackground();
 
 

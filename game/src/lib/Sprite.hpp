@@ -17,8 +17,8 @@ public:
     float scaleX = 1.0f;
     float scaleY = 1.0f;
 
-    glm::mat4 processModel();
-    void draw(const GLuint modelLoc, const GLuint offsetLoc);
+    glm::mat4 processModel() const;
+    void draw(const GLuint modelLoc, const GLuint offsetLoc) const;
 };
 
 #endif

@@ -1,17 +1,12 @@
 #include "Sprite.hpp"
 #include <glad.h>
 
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "glm/gtx/matrix_factorisation.hpp"
 
-glm::mat4 Sprite::processModel()
-{
+glm::mat4 Sprite::processModel() const {
     auto model = glm::mat4(1);
 
     model = glm::translate(model, glm::vec3(this->x, this->y, 0.0));
@@ -21,8 +16,7 @@ glm::mat4 Sprite::processModel()
     return model;
 }
 
-void Sprite::draw(const GLuint modelLoc, const GLuint offsetLoc)
-{
+void Sprite::draw(const GLuint modelLoc, const GLuint offsetLoc) const {
     auto model = processModel();
 
     glBindVertexArray(this->VAO);

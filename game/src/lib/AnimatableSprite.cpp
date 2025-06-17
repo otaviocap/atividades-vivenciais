@@ -1,7 +1,7 @@
 #include "AnimatableSprite.hpp"
 #include <GL/gl.h>
 
-void AnimatableSprite::changeDirection(Direction direction)
+void AnimatableSprite::changeDirection(const Direction direction)
 {
     this->isIdle = false;
 
@@ -14,8 +14,7 @@ void AnimatableSprite::changeDirection(Direction direction)
     animationFrame = 0;
 };
 
-void AnimatableSprite::draw(const GLuint modelLoc, const GLuint offsetLoc)
-{
+void AnimatableSprite::draw(const GLuint modelLoc, const GLuint offsetLoc) const {
     auto model = processModel();
 
     glBindVertexArray(this->VAO);
