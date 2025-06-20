@@ -56,12 +56,13 @@ inline const int *TILE_MAP[20] = {
     /* 18 */ DARK_TREE_TOP,
     /* 19 */ DARK_TREE_BOTTOM
 };
+
 class Map {
 public:
     const int tileMapXSize = 6;
     const int tileMapYSize = 4;
-    const int tileSize = 32;
-    const int halfTileSize = 32 / 2;
+    const int tileSize = 64;
+    const int halfTileSize = 15;
 
     GLuint VAO = 0;
     GLuint textureId = 0;
@@ -72,14 +73,24 @@ public:
     float scaleX = 64.0f;
     float scaleY = 64.0f;
 
-    int mapColumns = 3;
-    int mapRows = 3;
+    const static int mapColumns = 6;
+    const static int mapRows = 14;
 
-
-    int map[3][3] = {
-        {6, 6, 13},
-        {13, 6, 13},
-        {13, 13, 6},
+    int map[mapRows][mapColumns] = {
+        {5, 5, 5, 5, 5, 5},
+        {5, 5, 12, 12, 12, 5},
+        {5, 5, 12, 0, 12, 5},
+        {12, 12, 12, 0, 12, 12},
+        {0, 0, 0, 0, 0, 0},
+        {12, 12, 12, 0, 12, 12},
+        {5, 5, 12, 0, 12, 5},
+        {5, 5, 12, 0, 12, 5},
+        {5, 5, 12, 12, 12, 5},
+        {5, 5, 5, 5, 5, 5},
+        {5, 5, 5, 5, 5, 5},
+        {5, 5, 5, 5, 5, 5},
+        {5, 5, 5, 5, 5, 5},
+        {5, 5, 5, 5, 5, 5},
     };
 
     void draw(GLuint modelLoc, GLuint offsetLoc, int width, int height) const;
