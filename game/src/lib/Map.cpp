@@ -15,18 +15,14 @@ void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int hei
     glBindTexture(GL_TEXTURE_2D, this->textureId);
 
     for (int y = 0; y < mapRows; ++y) {
-        for (int x = 0; x < mapColumns; ++x) {
+        for (int x = mapColumns-1; x >= 0 ; --x) {
             auto tile = &TILE_MAP[map[y][x]];
             auto model = glm::mat4(1);
 
-            float localX = (float) width - (float) ((x + 1 + (y % 2 == 0 ? 0 : 0.5)) * tileSize);
-            float localY = (float) height - (float) ((y + 1) * halfTileSize * 1.2);
+            float localX = (float) width / 1.4 - ((float) (x * tileSize / 2) + (float) (y * tileSize / 2));
+            float localY = (float) height / 1.2 - ((float) (y * halfTileSize / 2) - (float) (x * halfTileSize / 2));
 
             model = glm::translate(model, glm::vec3(localX, localY, 0.0));
-            // std::cout << "X: " << localX << std::endl;
-            // std::cout << "Y: " << localY << std::endl;
-            // std::cout << "T.x: " << tile[0][0];
-            // std::cout << " T.y: " << tile[0][1] << std::endl;
 
             model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 0, 1));
             model = glm::scale(model, glm::vec3(scaleX, scaleY, 1.0f));
@@ -36,8 +32,6 @@ void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int hei
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
-    std::cout << '\n' << std::endl;
-
 }
 
 Map::Map() {

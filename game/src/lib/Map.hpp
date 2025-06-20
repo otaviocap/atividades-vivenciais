@@ -62,7 +62,7 @@ public:
     const int tileMapXSize = 6;
     const int tileMapYSize = 4;
     const int tileSize = 64;
-    const int halfTileSize = 15;
+    const int halfTileSize = 32;
 
     GLuint VAO = 0;
     GLuint textureId = 0;

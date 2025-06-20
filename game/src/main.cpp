@@ -56,19 +56,7 @@ void generateCharacter() {
     );
 }
 
-Sprite generateBackground() {
-    const Sprite sprite(
-        1,
-        "../../assets/background.png",
-        (float) WIDTH / 2,
-        (float) HEIGHT / 2,
-        (float) WIDTH,
-        (float) HEIGHT);
-
-    return sprite;
-}
-
-int main() {
+bool validateAndStartOpenGl(GLFWwindow *&window) {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -76,29 +64,38 @@ int main() {
 
     glfwWindowHint(GLFW_SAMPLES, 8);
 
-    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "M5 - Personagem com animação - Otávio", nullptr, nullptr);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Jogo isométrico", nullptr, nullptr);
 
     if (window == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        return -1;
+        return false;
     }
 
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
+        return false;
     }
 
     glViewport(0, 0, WIDTH, HEIGHT);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    return true;
+}
 
-    GLuint shaderProgram = createShaderProgram();
-    Sprite background = generateBackground();
+int main() {
+    GLFWwindow *window;
+
+    if (!validateAndStartOpenGl(window)) {
+        return -1;
+    }
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     generateCharacter();
     map.Initialize();
+
+    GLuint shaderProgram = createShaderProgram();
 
     glUseProgram(shaderProgram);
     glActiveTexture(GL_TEXTURE0);
@@ -139,14 +136,12 @@ int main() {
         }
 
         map.draw(modelLoc, offsetLoc, WIDTH, HEIGHT);
-        // background.draw(modelLoc, offsetLoc);
         // character.draw(modelLoc, offsetLoc);
 
         glfwSwapBuffers(window);
     }
 
     glDeleteVertexArrays(1, &character.VAO);
-    glDeleteVertexArrays(1, &background.VAO);
     glDeleteProgram(shaderProgram);
 
     glfwTerminate();
