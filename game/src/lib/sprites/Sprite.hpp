@@ -2,6 +2,8 @@
 #define SPRITE_H
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glad.h>
+#include <string>
+
 #include "GLFW/glfw3.h"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -18,7 +20,23 @@ public:
     float scaleY = 1.0f;
 
     glm::mat4 processModel() const;
-    void draw(const GLuint modelLoc, const GLuint offsetLoc) const;
-};
+    void draw(GLuint modelLoc, GLuint offsetLoc) const;
 
+    Sprite(
+        float size,
+        const std::string &filePath,
+        float x,
+        float y,
+        float scaleX,
+        float scaleY
+    );
+
+    Sprite();
+
+protected:
+    void PostConstuct(float size);
+
+    void Initialize(float size, int frames, int directions);
+
+};
 #endif

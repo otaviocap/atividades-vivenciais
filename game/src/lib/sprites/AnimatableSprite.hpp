@@ -29,9 +29,25 @@ public:
 
     bool isIdle = true;
 
+    AnimatableSprite(
+        float size,
+        const std::string &filePath,
+        float x,
+        float y,
+        float scaleX,
+        float scaleY,
+        int frames,
+        int directions
+    );
+
+    AnimatableSprite();
+
     void changeDirection(Direction direction);
 
     void draw(GLuint modelLoc, GLuint offsetLoc) const;
+
+    void PostConstuct(float size, int frames, int directions);
+
 };
 
 

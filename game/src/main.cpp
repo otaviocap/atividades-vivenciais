@@ -7,11 +7,8 @@
 #include "GLFW/glfw3.h"
 #include "glm/gtc/type_ptr.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
-#include "lib/Sprite.hpp"
-#include "lib/AnimatableSprite.hpp"
+#include "lib/sprites/Sprite.hpp"
+#include "lib/sprites/AnimatableSprite.hpp"
 #include "shaders/BaseShader.hpp"
 
 constexpr int WIDTH = 800;
@@ -44,106 +41,27 @@ void process_input(GLFWwindow *window) {
     }
 }
 
-
-GLuint createVBOAndBind(const GLuint VAO, const float *vertices, const int verticesLength) {
-    GLuint VBO;
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, verticesLength * sizeof(float), vertices, GL_STATIC_DRAW);
-
-    return VBO;
-}
-
-GLuint setupSprite(float size, int frames, int directions) {
-    GLuint VAO;
-    glGenVertexArrays(1, &VAO);
-
-    float framesOffset = 1.0f / (float) frames;
-    float directionOffset = 1.0f / (float) directions;
-
-    GLfloat vertices[] = {
-        // x     y     z     s     t
-        -0.5,  0.5, 0.0, 0.0, directionOffset, //V0
-        -0.5, -0.5, 0.0, 0.0, 0.0, //V1
-         0.5,  0.5, 0.0, framesOffset, directionOffset, //V2
-         0.5, -0.5, 0.0, framesOffset, 0.0  //V3
-    };
-
-    for (float & vertice : vertices) {
-        vertice *= size;
-    }
-
-    createVBOAndBind(VAO, vertices, std::size(vertices));
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *) (3 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    return VAO;
-}
-
-GLuint loadTexture(const std::string &filePath) {
-    GLuint texID;
-
-    glGenTextures(1, &texID);
-    glBindTexture(GL_TEXTURE_2D, texID);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    int width, height, nrChannels;
-
-    unsigned char *data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
-
-    if (data) {
-        if (nrChannels == 3) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        } else // png
-        {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        }
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-
-    stbi_image_free(data);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return texID;
-}
-
 void generateCharacter() {
-    character.x = (float) WIDTH / 2;
-    character.y = (float) HEIGHT / 2;
-    character.scaleX = 35;
-    character.scaleY = 35;
-    character.textureId = loadTexture("../../assets/character.png");
-
-    character.VAO = setupSprite(1, 4, 4);
+    character = AnimatableSprite(
+        1,
+        "../../assets/character.png",
+        (float) WIDTH / 2,
+        (float) HEIGHT / 2,
+        35,
+        35,
+        4,
+        4
+    );
 }
 
 Sprite generateBackground() {
-    Sprite sprite;
-    sprite.x = WIDTH / 2;
-    sprite.y = HEIGHT / 2;
-    sprite.scaleX = WIDTH;
-    sprite.scaleY = HEIGHT;
-
-    sprite.textureId = loadTexture("../../assets/background.png");
-
-    sprite.VAO = setupSprite(1, 1, 1);
+    const Sprite sprite(
+        1,
+        "../../assets/background.png",
+        (float) WIDTH / 2,
+        (float) HEIGHT / 2,
+        (float) WIDTH,
+        (float) HEIGHT);
 
     return sprite;
 }
@@ -177,7 +95,6 @@ int main() {
     GLuint shaderProgram = createShaderProgram();
     Sprite background = generateBackground();
 
-
     generateCharacter();
 
     glUseProgram(shaderProgram);
@@ -191,7 +108,7 @@ int main() {
     GLint offsetLoc = glGetUniformLocation(shaderProgram, "offset");
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model");
 
-    glm::mat4 projection = glm::ortho((float) WIDTH, 0.0f,  0.0f, (float) HEIGHT, -1.0f, 1.0f);
+    glm::mat4 projection = glm::ortho((float) WIDTH, 0.0f, 0.0f, (float) HEIGHT, -1.0f, 1.0f);
     glUniformMatrix4fv(
         glGetUniformLocation(shaderProgram, "projection"),
         1,
@@ -211,11 +128,10 @@ int main() {
         double currentTime = glfwGetTime();
         double deltaTime = currentTime - lastTime;
 
-        if (deltaTime >= 1.0/FPS)
-        {
+        if (deltaTime >= 1.0 / FPS) {
             character.animationFrame = !character.isIdle
-                ? (character.animationFrame + 1) % character.animationLength
-                : 0;
+                                           ? (character.animationFrame + 1) % character.animationLength
+                                           : 0;
             lastTime = currentTime;
         }
 
