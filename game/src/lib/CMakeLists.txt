@@ -1,6 +1,7 @@
 add_library(IsometricGame_lib STATIC
         Map.cpp Map.hpp
         Texture.cpp Texture.hpp
+        VboHelper.cpp VboHelper.hpp
         sprites/Sprite.cpp sprites/Sprite.hpp
         sprites/AnimatableSprite.cpp sprites/AnimatableSprite.hpp)
 

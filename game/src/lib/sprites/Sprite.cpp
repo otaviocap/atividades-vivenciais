@@ -6,6 +6,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "glm/gtx/matrix_factorisation.hpp"
 #include "../Texture.hpp"
+#include "../VboHelper.hpp"
+
 
 glm::mat4 Sprite::processModel() const {
     auto model = glm::mat4(1);
@@ -49,17 +51,6 @@ Sprite::Sprite(
 
 void Sprite::PostConstuct(const float size) {
     this->Initialize(size, 1, 1);
-}
-
-GLuint createVBOAndBind(const GLuint VAO, const float *vertices, const int verticesLength) {
-    GLuint VBO;
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, verticesLength * sizeof(float), vertices, GL_STATIC_DRAW);
-
-    return VBO;
 }
 
 void Sprite::Initialize(const float size, const int frames, const int directions) {

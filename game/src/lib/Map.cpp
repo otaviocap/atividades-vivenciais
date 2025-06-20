@@ -4,38 +4,46 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
+#include <iostream>
+
 #include "glm/gtx/matrix_factorisation.hpp"
 #include "Texture.hpp"
+#include "VboHelper.hpp"
 
-void Map::draw(const GLuint modelLoc) const {
-    auto model = glm::mat4(1);
-
-    model = glm::translate(model, glm::vec3(this->x, this->y, 0.0));
-    model = glm::rotate(model, this->rotation, glm::vec3(0, 0, 1));
-    model = glm::scale(model, glm::vec3(this->scaleX, this->scaleY, 1.0f));
-
+void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int height) const {
     glBindVertexArray(this->VAO);
     glBindTexture(GL_TEXTURE_2D, this->textureId);
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value_ptr(model));
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    for (int x = 0; x < mapColumns; ++x) {
+        for (int y = 0; y < mapRows; ++y) {
+            auto tile = &TILE_MAP[map[x][y]];
+            auto model = glm::mat4(1);
+
+            float localX = (float) width - (x * tileSize * scaleX);
+            float localY = (float) height - (y * halfTileSize * scaleY);
+
+            model = glm::translate(model, glm::vec3(localX, localY, 0.0));
+            std::cout << "X: " << localX << std::endl;
+            std::cout << "Y: " << localY << std::endl;
+
+            model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 0, 1));
+            model = glm::scale(model, glm::vec3(scaleX, scaleY, 1.0f));
+
+            glUniform2f(offsetLoc, (float) tile[0][0] / tileMapXSize, (float) tile[1][0] / tileMapYSize);
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value_ptr(model));
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        }
+    }
+    std::cout << std::endl;
+
 }
 
-
-Map::Map() {}
-
-
-GLuint createVBOAndBind(const GLuint VAO, const float *vertices, const int verticesLength) {
-    GLuint VBO;
-    glGenBuffers(1, &VBO);
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, verticesLength * sizeof(float), vertices, GL_STATIC_DRAW);
-
-    return VBO;
+Map::Map() {
 }
 
 void Map::Initialize() {
+    this->textureId = loadTexture("../../assets/tilemap.png");
+
     const float size = 1;
 
     GLuint VAO;
@@ -46,10 +54,10 @@ void Map::Initialize() {
 
     GLfloat vertices[] = {
         // x     y     z     s     t
-        -0.5,  0.5, 0.0, 0.0, xOffset, //V0
+        -0.5,  0.5, 0.0, 0.0, yOffset, //V0
         -0.5, -0.5, 0.0, 0.0, 0.0, //V1
-         0.5,  0.5, 0.0, yOffset, xOffset, //V2
-         0.5, -0.5, 0.0, yOffset, 0.0  //V3
+         0.5,  0.5, 0.0, xOffset, yOffset, //V2
+         0.5, -0.5, 0.0, xOffset, 0.0  //V3
     };
 
     for (float & vertice : vertices) {

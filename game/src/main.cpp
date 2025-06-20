@@ -6,6 +6,7 @@
 #include <glad.h>
 #include "GLFW/glfw3.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "lib/Map.hpp"
 
 #include "lib/sprites/Sprite.hpp"
 #include "lib/sprites/AnimatableSprite.hpp"
@@ -16,6 +17,7 @@ constexpr int HEIGHT = 600;
 constexpr int FPS = 4;
 
 AnimatableSprite character;
+Map map;
 
 void framebuffer_size_callback(GLFWwindow *window, const int width, const int height) {
     glViewport(0, 0, width, height);
@@ -96,6 +98,7 @@ int main() {
     Sprite background = generateBackground();
 
     generateCharacter();
+    map.Initialize();
 
     glUseProgram(shaderProgram);
     glActiveTexture(GL_TEXTURE0);
@@ -135,8 +138,9 @@ int main() {
             lastTime = currentTime;
         }
 
-        background.draw(modelLoc, offsetLoc);
-        character.draw(modelLoc, offsetLoc);
+        map.draw(modelLoc, offsetLoc, WIDTH, HEIGHT);
+        // background.draw(modelLoc, offsetLoc);
+        // character.draw(modelLoc, offsetLoc);
 
         glfwSwapBuffers(window);
     }
