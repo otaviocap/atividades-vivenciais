@@ -1,5 +1,6 @@
 #include "BaseShader.hpp"
 #include <iostream>
+#include <fstream>
 
 const std::string readFromFile(const GLchar* pathToFile)
 {
@@ -18,7 +19,6 @@ const std::string readFromFile(const GLchar* pathToFile)
     }
 
     fileStream.close();
-    std::cout << "'" << content << "'" << std::endl;
     return content;
 }
 
@@ -41,7 +41,7 @@ GLuint compileShader(const char *shaderSource, int shaderType)  {
 
 GLuint createShaderProgram() {
     const GLuint vertexShader = compileShader(readFromFile("../../shaders/BaseVert.vert").c_str(), GL_VERTEX_SHADER);
-    const GLuint fragmentShader = compileShader(readFromFile("../../assets/BaseFrag.frag").c_str(), GL_FRAGMENT_SHADER);
+    const GLuint fragmentShader = compileShader(readFromFile("../../shaders/BaseFrag.frag").c_str(), GL_FRAGMENT_SHADER);
 
     const GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
