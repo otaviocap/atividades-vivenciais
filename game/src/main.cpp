@@ -15,9 +15,11 @@
 
 constexpr int WIDTH = 800;
 constexpr int HEIGHT = 600;
-constexpr int FPS = 4;
+constexpr int CHARACTER_FPS = 4;
+constexpr int FPS = 20;
 
-World world(WIDTH, HEIGHT);
+Camera camera;
+World world(WIDTH, HEIGHT, &camera);
 AnimatableSprite character(world);
 Map map(world);
 
@@ -66,6 +68,9 @@ void process_input(GLFWwindow *window) {
         character.isIdle = true;
     }
 
+    camera.x = character.x;
+    camera.y = character.y;
+
     map.VisitTile((int) character.x, (int) character.y);
 }
 
@@ -110,6 +115,36 @@ bool validateAndStartOpenGl(GLFWwindow *&window) {
     return true;
 }
 
+double updateCharacter(GLFWwindow *window, double characterLastFrameTime) {
+    double currentTime = glfwGetTime();
+    double deltaTime = currentTime - characterLastFrameTime;
+
+    if (deltaTime >= 1.0 / CHARACTER_FPS) {
+        camera.process();
+        process_input(window);
+        character.animationFrame = !character.isIdle
+                                       ? (character.animationFrame + 1) % character.animationLength
+                                       : 0;
+        return currentTime;
+    }
+
+    return characterLastFrameTime;
+
+}
+
+double updateCamera(GLFWwindow * window, double cameraLastFrameTime) {
+    double currentTime = glfwGetTime();
+    double deltaTime = currentTime - cameraLastFrameTime;
+
+    if (deltaTime >= 1.0 / FPS) {
+        camera.process();
+
+        return currentTime;
+    }
+
+    return cameraLastFrameTime;
+}
+
 int main() {
     GLFWwindow *window;
 
@@ -143,7 +178,8 @@ int main() {
         value_ptr(projection)
     );
 
-    double lastTime = glfwGetTime();
+    double characterLastFrameTime = glfwGetTime();
+    double cameraLastFrameTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -151,16 +187,8 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        double currentTime = glfwGetTime();
-        double deltaTime = currentTime - lastTime;
-
-        if (deltaTime >= 1.0 / FPS) {
-            process_input(window);
-            character.animationFrame = !character.isIdle
-                                           ? (character.animationFrame + 1) % character.animationLength
-                                           : 0;
-            lastTime = currentTime;
-        }
+        characterLastFrameTime = updateCharacter(window, characterLastFrameTime);
+        cameraLastFrameTime =  updateCamera(window, characterLastFrameTime);
 
         char tmp[256];
         sprintf(tmp, "Bad Skeleton - Location: x: %.1f, y: %.1f", character.x, character.y);
