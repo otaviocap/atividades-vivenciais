@@ -170,7 +170,7 @@ int main() {
         return -1;
     }
 
-    Config c = ConfigManager::LoadConfiguration("../../maps/map1.txt");
+    Config c = ConfigManager::LoadConfiguration("../../maps/map0.txt");
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -214,7 +214,7 @@ int main() {
         sprintf(tmp, "Bad Skeleton - Location: x: %.1f, y: %.1f", character.x, character.y);
         glfwSetWindowTitle(window, tmp);
 
-        map.draw(modelLoc, offsetLoc, ScreenWidth, ScreenHeight);
+        map.draw(modelLoc, offsetLoc);
         character.draw(modelLoc, offsetLoc);
 
         glfwSwapBuffers(window);

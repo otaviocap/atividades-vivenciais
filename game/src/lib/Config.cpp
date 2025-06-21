@@ -53,6 +53,7 @@ Config ConfigManager::LoadConfiguration(const std::string& filePath) {
   }
 
   config.tileMap.resize(config.rows, std::vector<int>(config.columns, 0));
+  config.collectables.resize(config.rows, std::vector<int>(config.columns, 0));
 
   for (int row = 0; row < config.rows; ++row) {
     if (!std::getline(file, line)) {

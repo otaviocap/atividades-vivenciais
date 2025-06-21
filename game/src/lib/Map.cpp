@@ -4,18 +4,16 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <iostream>
-
 #include "glm/gtx/matrix_factorisation.hpp"
 #include "Texture.hpp"
 #include "VboHelper.hpp"
 
-void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int height) const {
-    glBindVertexArray(this->VAO);
-    glBindTexture(GL_TEXTURE_2D, this->textureId);
-
+void Map::draw(const GLuint modelLoc, const GLuint offsetLoc) {
     for (int y = 0; y < config->rows; ++y) {
         for (int x = config->columns-1; x >= 0 ; --x) {
+            glBindVertexArray(this->VAO);
+            glBindTexture(GL_TEXTURE_2D, this->textureId);
+
             auto tile = config->tileMap.at(x).at(y);
             auto model = glm::mat4(1);
 
@@ -29,6 +27,15 @@ void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int hei
             glUniform2f(offsetLoc, (float) (tile % config->xTiles) / (float) config->xTiles, (float) (tile / config->xTiles) / (float) config->yTiles);
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value_ptr(model));
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+            if (config->collectables.at(x).at(y) != 0) {
+                coin.x = (float) x;
+                coin.y = (float) y;
+
+                coin.rotation += glm::radians(1.0f);
+
+                coin.draw(modelLoc, offsetLoc);
+            }
         }
     }
 }
@@ -36,6 +43,7 @@ void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int hei
 void Map::Initialize(Config* config) {
     this->textureId = loadTexture("../../assets/" + config->tileMapFileName);
     this->config = config;
+    this->coin = Sprite(1, "../../assets/coin.png", 0, 0, 32, 32, world);
 
     const float size = 1;
 
@@ -73,6 +81,10 @@ void Map::Initialize(Config* config) {
 
 void Map::VisitTile(const int x, const int y) {
     config->tileMap.at(x).at(y) = config->substituteTileId;
+
+    if (config->collectables.at(x).at(y) != 0) {
+        config->collectables.at(x).at(y) = 0;
+    }
 }
 
 bool Map::CanMove(const int x, const int y) const {

@@ -15,8 +15,8 @@ public:
 
     World world;
 
-    float x = 0;
     float y = 0;
+    float x = 0;
     float rotation = glm::radians(180.0f);
     float scaleX = 1.0f;
     float scaleY = 1.0f;
