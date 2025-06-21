@@ -4,26 +4,13 @@
 #include <string>
 #include <vector>
 
-/**
-* File structure:
-*
-* tileMapFileName.png xTiles yTiles
-* nonWalkableTiles
-* deathTiles
-* rows columns
-* 0c 0 0 0 0 ...
-* 0 0c 0 0 0 ...
-* 0 0 0c 0 0 ...
-* 0 0 0 0c 0 ...
-* 0 0 0 0 0c ...
-* ...
-* (put a C where should be a coin)
-*/
 class Config {
   public:
     std::string tileMapFileName;
     int xTiles;
     int yTiles;
+    int tileWidth;
+    int tileHeigth;
     std::vector<int> nonWalkableTiles;
     std::vector<int> deathTiles;
 

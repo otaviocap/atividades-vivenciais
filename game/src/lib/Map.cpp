@@ -19,12 +19,12 @@ void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int hei
             auto tile = config->tileMap.at(x).at(y);
             auto model = glm::mat4(1);
 
-            glm::vec2 worldCoordinates = world.TranslateFromWorldToScreenCoordinates(x,y);
+            glm::vec2 worldCoordinates = world.TranslateFromWorldToScreenCoordinates(x, y);
 
             model = glm::translate(model, glm::vec3(worldCoordinates, 0.0));
 
             model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 0, 1));
-            model = glm::scale(model, glm::vec3(world.tileSize, world.tileSize, 1.0f));
+            model = glm::scale(model, glm::vec3(config->tileWidth, config->tileHeigth, 1.0f));
 
             glUniform2f(offsetLoc, (float) (tile % config->xTiles) / (float) config->xTiles, (float) (tile / config->xTiles) / (float) config->yTiles);
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value_ptr(model));

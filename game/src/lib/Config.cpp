@@ -18,7 +18,7 @@ Config ConfigManager::LoadConfiguration(const std::string& filePath) {
   std::getline(file, line);
   {
     std::istringstream ss(line);
-    ss >> config.tileMapFileName >> config.xTiles >> config.yTiles;
+    ss >> config.tileMapFileName >> config.xTiles >> config.yTiles >> config.tileWidth >> config.tileHeigth;
   }
 
   std::getline(file, line);

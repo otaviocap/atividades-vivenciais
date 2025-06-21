@@ -170,7 +170,7 @@ int main() {
         return -1;
     }
 
-    Config c = ConfigManager::LoadConfiguration("../../maps/map0.txt");
+    Config c = ConfigManager::LoadConfiguration("../../maps/map1.txt");
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 

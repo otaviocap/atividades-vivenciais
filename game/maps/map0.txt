@@ -1,4 +1,4 @@
-tilemap1.png 6 4
+tilemap1.png 6 4 64 64
 12
 12
 13
