@@ -5,16 +5,18 @@
 #include "glm/gtc/type_ptr.hpp"
 
 class World {
-int width, height;
+float width, height;
 Camera* camera;
 
 public:
-	const static int tileSize = 64;
-	const static int halfTileSize = tileSize / 2;
-	const static int margin = halfTileSize;
+	constexpr static float tileSize = 64.0f;
+	constexpr static float halfTileSize = tileSize / 2.0f;
+	constexpr static float margin = halfTileSize;
 
-	World(const int width, const int height, Camera* camera) : width(width), height(height), camera(camera) {};
+	World(const float width, const float height, Camera* camera) : width(width), height(height), camera(camera) {};
 	World() : width(0), height(0) {}
+
+	void UpdateScreen(float width, float height);
 
     glm::vec2 TranslateFromWorldToScreenCoordinates(float x, float y) const;
 };

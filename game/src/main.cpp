@@ -13,17 +13,25 @@
 #include "lib/sprites/AnimatableSprite.hpp"
 #include "shaders/BaseShader.hpp"
 
-constexpr int WIDTH = 800;
-constexpr int HEIGHT = 600;
+int ScreenWidth = 800;
+int ScreenHeight = 600;
 constexpr int CHARACTER_FPS = 4;
 constexpr int FPS = 20;
 
 Camera camera;
-World world(WIDTH, HEIGHT, &camera);
+World world(ScreenWidth, ScreenHeight, &camera);
 AnimatableSprite character(world);
 Map map(world);
 
+glm::mat4 projection;
+
 void framebuffer_size_callback(GLFWwindow *window, const int width, const int height) {
+    ScreenWidth = width;
+    ScreenHeight = height;
+
+    world.UpdateScreen(width, height);
+    projection = glm::ortho((float) width, 0.0f, 0.0f, (float) height, -1.0f, 1.0f);
+
     glViewport(0, 0, width, height);
 }
 
@@ -96,7 +104,7 @@ bool validateAndStartOpenGl(GLFWwindow *&window) {
 
     glfwWindowHint(GLFW_SAMPLES, 8);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Jogo isométrico - Bad Skeleton", nullptr, nullptr);
+    window = glfwCreateWindow(ScreenWidth, ScreenHeight, "Jogo isométrico - Bad Skeleton", nullptr, nullptr);
 
     if (window == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -111,7 +119,7 @@ bool validateAndStartOpenGl(GLFWwindow *&window) {
         return false;
     }
 
-    glViewport(0, 0, WIDTH, HEIGHT);
+    glViewport(0, 0, ScreenWidth, ScreenHeight);
     return true;
 }
 
@@ -170,7 +178,7 @@ int main() {
     GLint offsetLoc = glGetUniformLocation(shaderProgram, "offset");
     GLint modelLoc = glGetUniformLocation(shaderProgram, "model");
 
-    glm::mat4 projection = glm::ortho((float) WIDTH, 0.0f, 0.0f, (float) HEIGHT, -1.0f, 1.0f);
+    projection = glm::ortho((float) ScreenWidth, 0.0f, 0.0f, (float) ScreenHeight, -1.0f, 1.0f);
     glUniformMatrix4fv(
         glGetUniformLocation(shaderProgram, "projection"),
         1,
@@ -194,7 +202,7 @@ int main() {
         sprintf(tmp, "Bad Skeleton - Location: x: %.1f, y: %.1f", character.x, character.y);
         glfwSetWindowTitle(window, tmp);
 
-        map.draw(modelLoc, offsetLoc, WIDTH, HEIGHT);
+        map.draw(modelLoc, offsetLoc, ScreenWidth, ScreenHeight);
         character.draw(modelLoc, offsetLoc);
 
         glfwSwapBuffers(window);
