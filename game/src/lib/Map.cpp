@@ -14,9 +14,9 @@ void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int hei
     glBindVertexArray(this->VAO);
     glBindTexture(GL_TEXTURE_2D, this->textureId);
 
-    for (int y = 0; y < mapRows; ++y) {
-        for (int x = mapColumns-1; x >= 0 ; --x) {
-            auto tile = &TILE_MAP[map[y][x]];
+    for (int y = 0; y < config->rows; ++y) {
+        for (int x = config->columns-1; x >= 0 ; --x) {
+            auto tile = config->tileMap.at(x).at(y);
             auto model = glm::mat4(1);
 
             glm::vec2 worldCoordinates = world.TranslateFromWorldToScreenCoordinates(x,y);
@@ -26,23 +26,24 @@ void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int hei
             model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 0, 1));
             model = glm::scale(model, glm::vec3(world.tileSize, world.tileSize, 1.0f));
 
-            glUniform2f(offsetLoc, (float) tile[0][0] / tileMapXSize, (float) tile[0][1] / tileMapYSize);
+            glUniform2f(offsetLoc, (float) (tile % config->xTiles) / (float) config->xTiles, (float) (tile / config->xTiles) / (float) config->yTiles);
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value_ptr(model));
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
 }
 
-void Map::Initialize() {
-    this->textureId = loadTexture("../../assets/tilemap.png");
+void Map::Initialize(Config* config) {
+    this->textureId = loadTexture("../../assets/" + config->tileMapFileName);
+    this->config = config;
 
     const float size = 1;
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
 
-    float yOffset = 1.0f / (float) tileMapYSize;
-    float xOffset = 1.0f / (float) tileMapXSize;
+    float yOffset = 1.0f / (float) config->yTiles;
+    float xOffset = 1.0f / (float) config->xTiles;
 
     GLfloat vertices[] = {
         // x     y     z     s     t
@@ -71,6 +72,21 @@ void Map::Initialize() {
 }
 
 void Map::VisitTile(const int x, const int y) {
-    map[y][x] = 12;
+    config->tileMap.at(x).at(y) = config->substituteTileId;
+}
+
+bool Map::CanMove(const int x, const int y) const {
+    if (x < 0 || x >= config->rows || y < 0 || y >= config->columns) {
+        return false;
+    }
+
+    auto tile = config->tileMap.at(x).at(y);
+    auto nonWalkable = config->nonWalkableTiles;
+
+    if (std::find(nonWalkable.begin(), nonWalkable.end(), tile) != nonWalkable.end()) {
+        return false;
+    }
+
+    return true;
 }
 

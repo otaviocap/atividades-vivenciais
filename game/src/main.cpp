@@ -6,6 +6,7 @@
 #include <glad.h>
 #include "GLFW/glfw3.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "lib/Config.hpp"
 #include "lib/Map.hpp"
 #include "lib/World.hpp"
 
@@ -16,7 +17,7 @@
 int ScreenWidth = 800;
 int ScreenHeight = 600;
 constexpr int CHARACTER_FPS = 4;
-constexpr int FPS = 20;
+constexpr int FPS = 60;
 
 Camera camera;
 World world(ScreenWidth, ScreenHeight, &camera);
@@ -41,40 +42,49 @@ void process_input(GLFWwindow *window) {
     const bool LeftDirection = glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
     const bool RightDirection = glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
 
+    int tempX = character.x, tempY = character.y;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
     else if (UpDirection && LeftDirection) {
         character.changeDirection(Left);
-        character.y -= 1;
+        tempY -= 1;
     } else if (UpDirection && RightDirection) {
         character.changeDirection(Right);
-        character.x += 1;
+        tempX += 1;
     } else if (DownDirection && LeftDirection) {
         character.changeDirection(Left);
-        character.x -= 1;
+        tempX -= 1;
     } else if (DownDirection && RightDirection) {
         character.changeDirection(Right);
-        character.y += 1;
+        tempY += 1;
     } else if (UpDirection) {
         character.changeDirection(Up);
-        character.x += 1;
-        character.y -= 1;
+        tempX += 1;
+        tempY -= 1;
     } else if (DownDirection) {
         character.changeDirection(Down);
-        character.x -= 1;
-        character.y += 1;
+        tempX -= 1;
+        tempY += 1;
     } else if (LeftDirection) {
         character.changeDirection(Left);
-        character.x -= 1;
-        character.y -= 1;
+        tempX -= 1;
+        tempY -= 1;
     } else if (RightDirection) {
         character.changeDirection(Right);
-        character.x += 1;
-        character.y += 1;
+        tempX += 1;
+        tempY += 1;
     } else {
         character.isIdle = true;
     }
+
+    if (!map.CanMove(tempX, tempY)) {
+        return;
+    }
+
+    character.x = tempX;
+    character.y = tempY;
 
     camera.x = character.x;
     camera.y = character.y;
@@ -160,10 +170,12 @@ int main() {
         return -1;
     }
 
+    Config c = ConfigManager::LoadConfiguration("../../maps/map0.txt");
+
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     generateCharacter();
-    map.Initialize();
+    map.Initialize(&c);
 
     GLuint shaderProgram = createShaderProgram();
 
@@ -196,7 +208,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         characterLastFrameTime = updateCharacter(window, characterLastFrameTime);
-        cameraLastFrameTime =  updateCamera(window, characterLastFrameTime);
+        cameraLastFrameTime = updateCamera(window, cameraLastFrameTime);
 
         char tmp[256];
         sprintf(tmp, "Bad Skeleton - Location: x: %.1f, y: %.1f", character.x, character.y);

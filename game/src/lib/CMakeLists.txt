@@ -4,6 +4,7 @@ add_library(IsometricGame_lib STATIC
         VboHelper.cpp VboHelper.hpp
         World.cpp World.hpp
         Camera.cpp Camera.hpp
+        Config.cpp Config.hpp
         sprites/Sprite.cpp sprites/Sprite.hpp
         sprites/AnimatableSprite.cpp sprites/AnimatableSprite.hpp)
 
