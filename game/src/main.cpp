@@ -26,46 +26,47 @@ void framebuffer_size_callback(GLFWwindow *window, const int width, const int he
 }
 
 void process_input(GLFWwindow *window) {
-    const bool UpDirction = glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
-    const bool DownDirction = glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
-    const bool LeftDirction = glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-    const bool RightDirction = glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+    const bool UpDirection = glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+    const bool DownDirection = glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+    const bool LeftDirection = glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+    const bool RightDirection = glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-    else if (UpDirction && LeftDirction) {
+    else if (UpDirection && LeftDirection) {
         character.changeDirection(Left);
         character.y -= 1;
-    } else if (UpDirction && RightDirction) {
+    } else if (UpDirection && RightDirection) {
         character.changeDirection(Right);
         character.x += 1;
-    } else if (DownDirction && LeftDirction) {
+    } else if (DownDirection && LeftDirection) {
         character.changeDirection(Left);
         character.x -= 1;
-    } else if (DownDirction && RightDirction) {
+    } else if (DownDirection && RightDirection) {
         character.changeDirection(Right);
         character.y += 1;
-
-    } else if (UpDirction) {
+    } else if (UpDirection) {
         character.changeDirection(Up);
         character.x += 1;
         character.y -= 1;
-    } else if (DownDirction) {
+    } else if (DownDirection) {
         character.changeDirection(Down);
         character.x -= 1;
         character.y += 1;
-    } else if (LeftDirction) {
+    } else if (LeftDirection) {
         character.changeDirection(Left);
         character.x -= 1;
         character.y -= 1;
-    } else if (RightDirction) {
+    } else if (RightDirection) {
         character.changeDirection(Right);
         character.x += 1;
         character.y += 1;
     } else {
         character.isIdle = true;
     }
+
+    map.VisitTile((int) character.x, (int) character.y);
 }
 
 void generateCharacter() {
@@ -90,7 +91,7 @@ bool validateAndStartOpenGl(GLFWwindow *&window) {
 
     glfwWindowHint(GLFW_SAMPLES, 8);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Jogo isométrico", nullptr, nullptr);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Jogo isométrico - Bad Skeleton", nullptr, nullptr);
 
     if (window == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -162,7 +163,7 @@ int main() {
         }
 
         char tmp[256];
-        sprintf(tmp, "Location, x: %f, y: %f", character.x, character.y);
+        sprintf(tmp, "Bad Skeleton - Location: x: %.1f, y: %.1f", character.x, character.y);
         glfwSetWindowTitle(window, tmp);
 
         map.draw(modelLoc, offsetLoc, WIDTH, HEIGHT);

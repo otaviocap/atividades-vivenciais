@@ -70,3 +70,7 @@ void Map::Initialize() {
     this->VAO = VAO;
 }
 
+void Map::VisitTile(const int x, const int y) {
+    map[y][x] = 12;
+}
+
