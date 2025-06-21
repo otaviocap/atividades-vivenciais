@@ -9,6 +9,7 @@ AnimatableSprite::AnimatableSprite(
     const float y,
     const float scaleX,
     const float scaleY,
+    const World world,
     const int frames,
     const int directions)
     : Sprite(
@@ -17,12 +18,13 @@ AnimatableSprite::AnimatableSprite(
         x,
         y,
         scaleX,
-        scaleY
+        scaleY,
+        world
     ) {
     this->PostConstuct(size, frames, directions);
 }
 
-AnimatableSprite::AnimatableSprite(): Sprite() {}
+AnimatableSprite::AnimatableSprite(World world): Sprite(world) {}
 
 
 void AnimatableSprite::PostConstuct(const float size, const int frames, const int directions) {

@@ -1,20 +1,20 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
-#include "Map.hpp"
-#include "sprites/AnimatableSprite.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 class World {
+int width, height;
+
 public:
-  World();
+	const static int tileSize = 64;
+	const static int halfTileSize = tileSize / 2;
+	const static int margin = halfTileSize;
 
-  glm::vec2 TranslateFromWorldToScreen(float x, float y);
+	World(const int width, const int height) : width(width), height(height) {};
+	World() : width(0), height(0) {}
 
-private:
-    Map map;
-    AnimatableSprite character;
-
-
+    glm::vec2 TranslateFromWorldToScreenCoordinates(float x, float y) const;
 };
 
 #endif //WORLD_HPP

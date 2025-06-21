@@ -12,7 +12,9 @@
 glm::mat4 Sprite::processModel() const {
     auto model = glm::mat4(1);
 
-    model = glm::translate(model, glm::vec3(this->x, this->y, 0.0));
+    auto screenCoordinates = world.TranslateFromWorldToScreenCoordinates(x,y);
+
+    model = glm::translate(model, glm::vec3(screenCoordinates, 0.0));
     model = glm::rotate(model, this->rotation, glm::vec3(0, 0, 1));
     model = glm::scale(model, glm::vec3(this->scaleX, this->scaleY, 1.0f));
 
@@ -30,7 +32,7 @@ void Sprite::draw(const GLuint modelLoc, const GLuint offsetLoc) const {
 }
 
 
-Sprite::Sprite() {}
+Sprite::Sprite(const World world) : world(world) {}
 
 Sprite::Sprite(
     const float size,
@@ -38,13 +40,15 @@ Sprite::Sprite(
     const float x,
     const float y,
     const float scaleX,
-    const float scaleY
+    const float scaleY,
+    const World world
 ) {
     this->textureId = loadTexture(filePath);
     this->x = x;
     this->y = y;
     this->scaleX = scaleX;
     this->scaleY = scaleY;
+    this->world = world;
 
     this->PostConstuct(size);
 }

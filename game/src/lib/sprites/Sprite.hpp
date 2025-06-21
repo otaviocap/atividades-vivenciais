@@ -4,7 +4,7 @@
 #include <glad.h>
 #include <string>
 
-#include "GLFW/glfw3.h"
+#include "../World.hpp"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -12,6 +12,8 @@ class Sprite {
 public:
     GLuint VAO = 0;
     GLuint textureId = 0;
+
+    World world;
 
     float x = 0;
     float y = 0;
@@ -28,10 +30,11 @@ public:
         float x,
         float y,
         float scaleX,
-        float scaleY
+        float scaleY,
+        World world
     );
 
-    Sprite();
+    Sprite(World world);
 
 protected:
     void PostConstuct(float size);

@@ -19,22 +19,18 @@ void Map::draw(const GLuint modelLoc, const GLuint offsetLoc, int width, int hei
             auto tile = &TILE_MAP[map[y][x]];
             auto model = glm::mat4(1);
 
-            float localX = (float) width / 1.4 - ((float) (x * tileSize / 2) + (float) (y * tileSize / 2));
-            float localY = (float) height / 1.2 - ((float) (y * halfTileSize / 2) - (float) (x * halfTileSize / 2));
+            glm::vec2 worldCoordinates = world.TranslateFromWorldToScreenCoordinates(x,y);
 
-            model = glm::translate(model, glm::vec3(localX, localY, 0.0));
+            model = glm::translate(model, glm::vec3(worldCoordinates, 0.0));
 
             model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0, 0, 1));
-            model = glm::scale(model, glm::vec3(scaleX, scaleY, 1.0f));
+            model = glm::scale(model, glm::vec3(world.tileSize, world.tileSize, 1.0f));
 
             glUniform2f(offsetLoc, (float) tile[0][0] / tileMapXSize, (float) tile[0][1] / tileMapYSize);
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value_ptr(model));
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
-}
-
-Map::Map() {
 }
 
 void Map::Initialize() {

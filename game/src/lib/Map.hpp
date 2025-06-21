@@ -4,6 +4,7 @@
 #include <glad.h>
 #include <string>
 
+#include "World.hpp"
 #include "GLFW/glfw3.h"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -61,41 +62,40 @@ class Map {
 public:
     const int tileMapXSize = 6;
     const int tileMapYSize = 4;
-    const int tileSize = 64;
-    const int halfTileSize = 32;
 
     GLuint VAO = 0;
     GLuint textureId = 0;
+    World world;
 
-    float x = 0;
-    float y = 0;
-    float rotation = glm::radians(180.0f);
-    float scaleX = 64.0f;
-    float scaleY = 64.0f;
-
-    const static int mapColumns = 6;
-    const static int mapRows = 14;
+    const static int mapColumns = 12;
+    const static int mapRows = 20;
 
     int map[mapRows][mapColumns] = {
-        {5, 5, 5, 5, 5, 5},
-        {5, 5, 12, 12, 12, 5},
-        {5, 5, 12, 0, 12, 5},
-        {12, 12, 12, 0, 12, 12},
-        {0, 0, 0, 0, 0, 0},
-        {12, 12, 12, 0, 12, 12},
-        {5, 5, 12, 0, 12, 5},
-        {5, 5, 12, 0, 12, 5},
-        {5, 5, 12, 12, 12, 5},
-        {5, 5, 5, 5, 5, 5},
-        {5, 5, 5, 5, 5, 5},
-        {5, 5, 5, 5, 5, 5},
-        {5, 5, 5, 5, 5, 5},
-        {5, 5, 5, 5, 5, 5},
+        {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {5, 5, 13, 13, 5, 5, 13, 13, 5, 5, 5, 5},
+        {5, 13, 13, 13, 5, 5, 13, 13, 5, 5, 5, 5},
+        {5, 13, 12, 12, 12, 12, 12, 13, 5, 5, 5, 5},
+        {5, 12, 12, 0, 0, 0, 12, 12, 5, 5, 5, 5},
+        {5, 12, 0, 0, 0, 0, 0, 12, 5, 5, 5, 5},
+        {5, 12, 0, 0, 0, 0, 0, 12, 12, 5, 5, 5},
+        {5, 12, 0, 0, 0, 0, 0, 0, 12, 5, 5, 5},
+        {5, 12, 12, 12, 12, 12, 12, 12, 12, 5, 5, 5},
+        {5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 5, 5},
+        {5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 5},
+        {5, 5, 5, 0, 0, 12, 12, 0, 0, 0, 0, 5},
+        {5, 5, 0, 0, 12, 5, 5, 12, 0, 0, 0, 5},
+        {5, 0, 0, 12, 5, 5, 5, 5, 12, 0, 0, 5},
+        {5, 0, 12, 5, 5, 5, 5, 5, 5, 12, 0, 5},
+        {5, 12, 5, 5, 5, 5, 5, 5, 5, 5, 12, 5},
+        {5, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 5},
+        {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
+        {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
     };
 
     void draw(GLuint modelLoc, GLuint offsetLoc, int width, int height) const;
 
-    Map();
+    Map(World w) : world(w) {};
 
     void Initialize();
 };

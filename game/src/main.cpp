@@ -7,6 +7,7 @@
 #include "GLFW/glfw3.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "lib/Map.hpp"
+#include "lib/World.hpp"
 
 #include "lib/sprites/Sprite.hpp"
 #include "lib/sprites/AnimatableSprite.hpp"
@@ -16,28 +17,52 @@ constexpr int WIDTH = 800;
 constexpr int HEIGHT = 600;
 constexpr int FPS = 4;
 
-AnimatableSprite character;
-Map map;
+World world(WIDTH, HEIGHT);
+AnimatableSprite character(world);
+Map map(world);
 
 void framebuffer_size_callback(GLFWwindow *window, const int width, const int height) {
     glViewport(0, 0, width, height);
 }
 
 void process_input(GLFWwindow *window) {
+    const bool UpDirction = glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+    const bool DownDirction = glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+    const bool LeftDirction = glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+    const bool RightDirction = glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-    } else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        character.changeDirection(Up);
-        character.y += 1;
-    } else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        character.changeDirection(Down);
-        character.y -= 1;
-    } else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    }
+    else if (UpDirction && LeftDirction) {
         character.changeDirection(Left);
-        character.x += 1;
-    } else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        character.y -= 1;
+    } else if (UpDirction && RightDirction) {
         character.changeDirection(Right);
+        character.x += 1;
+    } else if (DownDirction && LeftDirction) {
+        character.changeDirection(Left);
         character.x -= 1;
+    } else if (DownDirction && RightDirction) {
+        character.changeDirection(Right);
+        character.y += 1;
+
+    } else if (UpDirction) {
+        character.changeDirection(Up);
+        character.x += 1;
+        character.y -= 1;
+    } else if (DownDirction) {
+        character.changeDirection(Down);
+        character.x -= 1;
+        character.y += 1;
+    } else if (LeftDirction) {
+        character.changeDirection(Left);
+        character.x -= 1;
+        character.y -= 1;
+    } else if (RightDirction) {
+        character.changeDirection(Right);
+        character.x += 1;
+        character.y += 1;
     } else {
         character.isIdle = true;
     }
@@ -47,10 +72,11 @@ void generateCharacter() {
     character = AnimatableSprite(
         1,
         "../../assets/character.png",
-        (float) WIDTH / 2,
-        (float) HEIGHT / 2,
+        0,
+        0,
         35,
         35,
+        world,
         4,
         4
     );
@@ -120,7 +146,6 @@ int main() {
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        process_input(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -129,14 +154,19 @@ int main() {
         double deltaTime = currentTime - lastTime;
 
         if (deltaTime >= 1.0 / FPS) {
+            process_input(window);
             character.animationFrame = !character.isIdle
                                            ? (character.animationFrame + 1) % character.animationLength
                                            : 0;
             lastTime = currentTime;
         }
 
+        char tmp[256];
+        sprintf(tmp, "Location, x: %f, y: %f", character.x, character.y);
+        glfwSetWindowTitle(window, tmp);
+
         map.draw(modelLoc, offsetLoc, WIDTH, HEIGHT);
-        // character.draw(modelLoc, offsetLoc);
+        character.draw(modelLoc, offsetLoc);
 
         glfwSwapBuffers(window);
     }

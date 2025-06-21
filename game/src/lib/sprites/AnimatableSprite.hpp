@@ -36,11 +36,12 @@ public:
         float y,
         float scaleX,
         float scaleY,
+        World world,
         int frames,
         int directions
     );
 
-    AnimatableSprite();
+    AnimatableSprite(World world);
 
     void changeDirection(Direction direction);
 
