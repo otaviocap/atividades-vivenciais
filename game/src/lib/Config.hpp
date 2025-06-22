@@ -19,11 +19,11 @@ class Config {
     int substituteTileId;
     std::vector<std::vector<int>> tileMap;
     std::vector<std::vector<int>> collectables;
+
+    int collectablesCount = 0;
 };
 
 class ConfigManager {
-  static constexpr char delimiter = ' ';
-
 public:
   static Config LoadConfiguration(const std::string& filePath);
 };

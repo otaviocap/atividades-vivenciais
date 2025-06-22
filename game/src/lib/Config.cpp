@@ -68,6 +68,7 @@ Config ConfigManager::LoadConfiguration(const std::string& filePath) {
       if (token.find('c') != std::string::npos) {
         token.erase(std::remove(token.begin(), token.end(), 'c'), token.end());
         config.collectables[row][col] = 1;
+        config.collectablesCount++;
       }
 
       config.tileMap[row][col] = token.empty() ? 0 : std::stoi(token);

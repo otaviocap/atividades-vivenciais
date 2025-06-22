@@ -18,11 +18,15 @@ int ScreenWidth = 800;
 int ScreenHeight = 600;
 constexpr int CHARACTER_FPS = 4;
 constexpr int FPS = 60;
+constexpr int MAX_MAPS = 3;
+int MapCount = 0;
 
+Config config;
 Camera camera;
 World world(ScreenWidth, ScreenHeight, &camera);
 AnimatableSprite character(world);
 Map map(world);
+
 
 glm::mat4 projection;
 
@@ -36,11 +40,40 @@ void framebuffer_size_callback(GLFWwindow *window, const int width, const int he
     glViewport(0, 0, width, height);
 }
 
+void generateCharacter() {
+    character = AnimatableSprite(
+        1,
+        "../../assets/character.png",
+        0,
+        0,
+        35,
+        35,
+        world,
+        4,
+        4
+    );
+}
+
+void NextMap() {
+    MapCount = (MapCount + 1) % MAX_MAPS;
+}
+
+void startGame() {
+    config = ConfigManager::LoadConfiguration("../../maps/map" + std::to_string(MapCount) + ".txt");
+    map.Initialize(&config);
+    character.x = 0.0f;
+    character.y = 0.0f;
+}
+
 void process_input(GLFWwindow *window) {
     const bool UpDirection = glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
     const bool DownDirection = glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
     const bool LeftDirection = glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
     const bool RightDirection = glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+    const bool RestartKey = glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS;
+
+    camera.x = character.x;
+    camera.y = character.y;
 
     int tempX = character.x, tempY = character.y;
 
@@ -79,31 +112,24 @@ void process_input(GLFWwindow *window) {
         character.isIdle = true;
     }
 
-    if (!map.CanMove(tempX, tempY)) {
+    if (!map.CanMove(tempX, tempY) && !RestartKey) {
+        return;
+    }
+
+    if (RestartKey || map.IsDeathableTile(tempX, tempY)) {
+        startGame();
         return;
     }
 
     character.x = tempX;
     character.y = tempY;
 
-    camera.x = character.x;
-    camera.y = character.y;
-
     map.VisitTile((int) character.x, (int) character.y);
-}
 
-void generateCharacter() {
-    character = AnimatableSprite(
-        1,
-        "../../assets/character.png",
-        0,
-        0,
-        35,
-        35,
-        world,
-        4,
-        4
-    );
+    if (map.GameHasFinished()) {
+        NextMap();
+        startGame();
+    }
 }
 
 bool validateAndStartOpenGl(GLFWwindow *&window) {
@@ -140,9 +166,9 @@ double updateCharacter(GLFWwindow *window, double characterLastFrameTime) {
     if (deltaTime >= 1.0 / CHARACTER_FPS) {
         camera.process();
         process_input(window);
-        character.animationFrame = !character.isIdle
-                                       ? (character.animationFrame + 1) % character.animationLength
-                                       : 0;
+
+        character.UpdateFrame();
+
         return currentTime;
     }
 
@@ -163,6 +189,7 @@ double updateCamera(GLFWwindow * window, double cameraLastFrameTime) {
     return cameraLastFrameTime;
 }
 
+
 int main() {
     GLFWwindow *window;
 
@@ -170,14 +197,11 @@ int main() {
         return -1;
     }
 
-    Config c = ConfigManager::LoadConfiguration("../../maps/map0.txt");
-
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    GLuint shaderProgram = createShaderProgram();
 
     generateCharacter();
-    map.Initialize(&c);
-
-    GLuint shaderProgram = createShaderProgram();
+    startGame();
 
     glUseProgram(shaderProgram);
     glActiveTexture(GL_TEXTURE0);
@@ -211,7 +235,7 @@ int main() {
         cameraLastFrameTime = updateCamera(window, cameraLastFrameTime);
 
         char tmp[256];
-        sprintf(tmp, "Bad Skeleton - Location: x: %.1f, y: %.1f", character.x, character.y);
+        sprintf(tmp, "Bad Skeleton - Location: x: %.1f, y: %.1f - Collectables: %d", character.x, character.y, map.config->collectablesCount);
         glfwSetWindowTitle(window, tmp);
 
         map.draw(modelLoc, offsetLoc);

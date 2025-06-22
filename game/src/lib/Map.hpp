@@ -19,6 +19,8 @@ public:
 
     void draw(GLuint modelLoc, GLuint offsetLoc);
 
+    bool IsDeathableTile(int x, int y);
+
     Map(World w) :
         world(w), coin(w) { };
 
@@ -27,5 +29,7 @@ public:
     void VisitTile(int x, int y);
 
     [[nodiscard]] bool CanMove(int x, int y) const;
+
+    bool GameHasFinished() const;
 };
 #endif

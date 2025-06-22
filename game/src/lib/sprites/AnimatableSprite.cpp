@@ -24,7 +24,8 @@ AnimatableSprite::AnimatableSprite(
     this->PostConstuct(size, frames, directions);
 }
 
-AnimatableSprite::AnimatableSprite(World world): Sprite(world) {}
+AnimatableSprite::AnimatableSprite(World world): Sprite(world) {
+}
 
 
 void AnimatableSprite::PostConstuct(const float size, const int frames, const int directions) {
@@ -42,6 +43,12 @@ void AnimatableSprite::changeDirection(const Direction direction) {
     this->direction = direction;
     animationFrame = 0;
 };
+
+void AnimatableSprite::UpdateFrame() {
+    this->animationFrame = !this->isIdle
+                               ? (this->animationFrame + 1) % this->animationLength
+                               : 0;
+}
 
 void AnimatableSprite::draw(const GLuint modelLoc, const GLuint offsetLoc) const {
     auto model = processModel();

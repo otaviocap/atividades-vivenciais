@@ -49,6 +49,8 @@ public:
 
     void PostConstuct(float size, int frames, int directions);
 
+    void UpdateFrame();
+
 };
 
 

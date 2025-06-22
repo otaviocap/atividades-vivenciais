@@ -9,6 +9,8 @@
 #include "VboHelper.hpp"
 
 void Map::draw(const GLuint modelLoc, const GLuint offsetLoc) {
+    coin.rotation += glm::radians(0.5f);
+
     for (int y = 0; y < config->rows; ++y) {
         for (int x = config->columns-1; x >= 0 ; --x) {
             glBindVertexArray(this->VAO);
@@ -32,12 +34,21 @@ void Map::draw(const GLuint modelLoc, const GLuint offsetLoc) {
                 coin.x = (float) x;
                 coin.y = (float) y;
 
-                coin.rotation += glm::radians(1.0f);
-
                 coin.draw(modelLoc, offsetLoc);
             }
         }
     }
+}
+
+bool Map::IsDeathableTile(int x, int y) {
+    auto tile = config->tileMap.at(x).at(y);
+    auto deathTiles = config->deathTiles;
+
+    if (std::find(deathTiles.begin(), deathTiles.end(), tile) != deathTiles.end()) {
+        return true;
+    }
+
+    return false;
 }
 
 void Map::Initialize(Config* config) {
@@ -84,6 +95,7 @@ void Map::VisitTile(const int x, const int y) {
 
     if (config->collectables.at(x).at(y) != 0) {
         config->collectables.at(x).at(y) = 0;
+        config->collectablesCount--;
     }
 }
 
@@ -100,5 +112,9 @@ bool Map::CanMove(const int x, const int y) const {
     }
 
     return true;
+}
+
+bool Map::GameHasFinished() const {
+    return config->collectablesCount == 0;
 }
 
